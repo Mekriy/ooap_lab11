@@ -1,0 +1,16 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ooap_lab11", "ooap_lab11\ooap_lab11.csproj", "{EA8EF2F7-F720-4F15-AA23-94D6C0255BA6}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{EA8EF2F7-F720-4F15-AA23-94D6C0255BA6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EA8EF2F7-F720-4F15-AA23-94D6C0255BA6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EA8EF2F7-F720-4F15-AA23-94D6C0255BA6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EA8EF2F7-F720-4F15-AA23-94D6C0255BA6}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

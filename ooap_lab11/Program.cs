@@ -12,12 +12,16 @@ class Program
         string baseUrl = "https://uakino.club/";
         int pageCount = 4;
 
-        var movieTitles = await GetMovieTitlesAsync(baseUrl, pageCount);
-
-        foreach (var title in movieTitles)
+        Task<List<string>> getMovieTitlesTask = GetMovieTitlesAsync(baseUrl, pageCount);
+        await getMovieTitlesTask.ContinueWith(task =>
         {
-            Console.WriteLine(title);
-        }
+            List<string> movieTitles = task.Result;
+            foreach (var title in movieTitles)
+            {
+                Console.WriteLine(title);
+            }
+        });
+        await getMovieTitlesTask;
     }
 
     static async Task<List<string>> GetMovieTitlesAsync(string baseUrl, int pageCount)

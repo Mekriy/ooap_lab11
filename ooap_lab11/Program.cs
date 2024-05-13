@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net.Http;
-using System.Text;
-using System.Threading.Tasks;
-using HtmlAgilityPack;
+﻿using HtmlAgilityPack;
 
 class Program
 {
@@ -12,39 +7,45 @@ class Program
         string baseUrl = "https://uakino.club/";
         int pageCount = 4;
 
-        Task<List<string>> getMovieTitlesTask = GetMovieTitlesAsync(baseUrl, pageCount);
-        await getMovieTitlesTask.ContinueWith(task =>
+        List<Task<List<string>>> tasks = new List<Task<List<string>>>();
+
+        for (int i = 1; i <= pageCount; i++)
         {
-            List<string> movieTitles = task.Result;
+            tasks.Add(GetMovieTitlesAsync(baseUrl, i));
+        }
+
+        await Task.WhenAll(tasks);
+
+        foreach (var task in tasks)
+        {
+            List<string> movieTitles = await task;
+            Console.WriteLine("-----------------NEW PAGE-----------------");
             foreach (var title in movieTitles)
             {
                 Console.WriteLine(title);
             }
-        });
-        await getMovieTitlesTask;
+        }
     }
 
-    static async Task<List<string>> GetMovieTitlesAsync(string baseUrl, int pageCount)
+    private static async Task<List<string>> GetMovieTitlesAsync(string baseUrl, int page)
     {
         List<string> movieTitles = new List<string>();
 
         using (HttpClient client = new HttpClient())
         {
-            for (int i = 1; i <= pageCount; i++)
+            string url = $"{baseUrl}/page/{page}/";
+            HttpResponseMessage response = await client.GetAsync(url);
+
+            if (response.IsSuccessStatusCode)
             {
-                string url = $"{baseUrl}/page/{i}/";
-                HttpResponseMessage response = await client.GetAsync(url);
+                string htmlContent = await response.Content.ReadAsStringAsync();
+                HtmlDocument htmlDoc = new HtmlDocument();
+                htmlDoc.LoadHtml(htmlContent);
 
-                if (response.IsSuccessStatusCode)
+                var titleNodes = htmlDoc.DocumentNode.SelectNodes("//a[@class='movie-title']");
+
+                if (titleNodes != null)
                 {
-                    string htmlContent = await response.Content.ReadAsStringAsync();
-                    HtmlDocument htmlDoc = new HtmlDocument();
-                    
-                    htmlDoc.LoadHtml(htmlContent);
-                    htmlDoc.OptionDefaultStreamEncoding = Encoding.UTF8;
-
-                    var titleNodes = htmlDoc.DocumentNode.SelectNodes("//a[@class='movie-title']");
-
                     foreach (var titleNode in titleNodes)
                     {
                         movieTitles.Add(titleNode.InnerText.Trim());
@@ -52,8 +53,12 @@ class Program
                 }
                 else
                 {
-                    Console.WriteLine($"Failed to retrieve page {i}. Status code: {response.StatusCode}");
+                    Console.WriteLine($"No movie titles found on page {page}");
                 }
+            }
+            else
+            {
+                Console.WriteLine($"Failed to retrieve page {page}. Status code: {response.StatusCode}");
             }
         }
 
